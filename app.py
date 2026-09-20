@@ -7,8 +7,8 @@ from supabase import Client, create_client
 app = Flask(__name__)
 
 # ตั้งค่า Supabase (เปลี่ยนเป็นค่าของคุณ หรือใช้ Environment Variable)
-SUPABASE_URL = os.environ.get("SUPABASE_URL", "YOUR_SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "YOUR_SUPABASE_KEY")
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://xwgqgyvtbvlyupgkzcym.supabase.co/rest/v1/")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh3Z3FneXZ0YnZseXVwZ2t6Y3ltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MDI0MjQsImV4cCI6MjEwNTQ3ODQyNH0.njllNrndwZUqlxjyWbX-jQnR18_k15ZsnUHayuVGCs8")
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
