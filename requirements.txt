@@ -1,3 +1,5 @@
 flask
 supabase
+requests
+beautifulsoup4
 gunicorn

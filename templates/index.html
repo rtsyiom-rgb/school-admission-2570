@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบเช็กวันรับสมัครโรงเรียน</title>
+    <!-- ฝัง CSS ไว้ในไฟล์เดียวแบบสไตล์โมเดิร์น โทนเข้มเท่ๆ -->
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #1e293b;
+            padding-bottom: 1rem;
+        }
+        h1 {
+            font-size: 1.8rem;
+            color: #38bdf8;
+        }
+        .btn-scraper {
+            background-color: #0ea5e9;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .btn-scraper:hover {
+            background-color: #0284c7;
+        }
+        .card-grid {
+            display: grid;
+            gap: 1rem;
+        }
+        .school-card {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .school-info h3 {
+            color: #f1f5f9;
+            margin-bottom: 0.5rem;
+        }
+        .school-info p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+        .school-action a {
+            background-color: #334155;
+            color: #38bdf8;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        .school-action a:hover {
+            background-color: #475569;
+        }
+        #status-msg {
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #34d399;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏫 เช็ควันรับสมัครโรงเรียน (AI Bot Sync)</h1>
+            <button class="btn-scraper" onclick="triggerScraper()">🔄 สแกนเว็บอัปเดตข้อมูล</button>
+        </header>
+
+        <div id="status-msg"></div>
+
+        <div class="card-grid">
+            {% if schools %}
+                {% for school in schools %}
+                <div class="school-card">
+                    <div class="school-info">
+                        <h3>{{ school.school_name }}</h3>
+                        <p><strong>กำหนดการ:</strong> {{ school.deadline }}</p>
+                    </div>
+                    <div class="school-action">
+                        {% if school.website_link and school.website_link != '#' %}
+                            <a href="{{ school.website_link }}" target="_blank">🔗 ไปที่เว็บโรงเรียน</a>
+                        {% else %}
+                            <span style="color: #64748b; font-size: 0.9rem;">ไม่มีลิงก์เว็บไซต์</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="text-align: center; color: #64748b;">ไม่พบข้อมูลโรงเรียนในระบบ กรุณาตรวจสอบการเชื่อมต่อ Supabase</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- JavaScript สำหรับสั่งให้ปุ่มกดทำงานเรียก Scraper -->
+    <script>
+        function triggerScraper() {
+            const msgBox = document.getElementById('status-msg');
+            msgBox.innerText = "⏳ กำลังสั่งบอทวิ่งไปเช็กเว็บโรงเรียนทั้งหมด...";
+            
+            fetch('/run-scraper', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    msgBox.innerText = "✅ " + data.message;
+                    setTimeout(() => location.reload(), 1500); // รีโหลดหน้าจออัปเดตข้อมูลใหม่
+                } else {
+                    msgBox.innerText = "❌ เกิดข้อผิดพลาด: " + data.message;
+                }
+            })
+            .catch(error => {
+                msgBox.innerText = "❌ ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้";
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
